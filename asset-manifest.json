@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/entrust-companion/static/css/main.e6c13ad2.css",
+    "main.js": "/entrust-companion/static/js/main.735288c6.js",
+    "static/js/453.d6b5948e.chunk.js": "/entrust-companion/static/js/453.d6b5948e.chunk.js",
+    "index.html": "/entrust-companion/index.html",
+    "main.e6c13ad2.css.map": "/entrust-companion/static/css/main.e6c13ad2.css.map",
+    "main.735288c6.js.map": "/entrust-companion/static/js/main.735288c6.js.map",
+    "453.d6b5948e.chunk.js.map": "/entrust-companion/static/js/453.d6b5948e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.735288c6.js"
+  ]
+}
