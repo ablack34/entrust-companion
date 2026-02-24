@@ -224,7 +224,7 @@ const Recommendations: React.FC = () => {
   const [filter, setFilter] = useState<string>('all');
   const [page, setPage] = useState(0);
 
-  const recommendations = activeRun?.recommendations ?? [];
+  const recommendations = useMemo(() => activeRun?.recommendations ?? [], [activeRun?.recommendations]);
 
   const filtered = useMemo(() => {
     switch (filter) {

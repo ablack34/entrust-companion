@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Card,
   Text,
@@ -567,12 +567,9 @@ function getGreeting(): string {
 const Dashboard: React.FC = () => {
   const styles = useStyles();
   const { state, dispatch } = useApp();
-  const [animateStats, setAnimateStats] = useState(false);
 
   useEffect(() => {
     ensureAnimations();
-    const t = setTimeout(() => setAnimateStats(true), 100);
-    return () => clearTimeout(t);
   }, []);
 
   const handleNewRun = () => {

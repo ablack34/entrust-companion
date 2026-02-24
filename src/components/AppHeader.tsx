@@ -4,11 +4,10 @@ import {
   tokens,
   Text,
   Avatar,
-  Toolbar,
   ToolbarButton,
   Tooltip,
 } from '@fluentui/react-components';
-import { Home24Regular, Settings24Regular } from '@fluentui/react-icons';
+import { Home24Regular } from '@fluentui/react-icons';
 import { useApp } from '../context/AppContext';
 
 const useStyles = makeStyles({
