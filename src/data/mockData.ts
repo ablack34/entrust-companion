@@ -322,4 +322,78 @@ export const mockDashboardStats = {
   totalImported: 40127,
   prioritizedThisMonth: 2340,
   outreachPacksSent: 156,
+  conversionRate: 18.4,
+  avgScore: 87,
+  activeRuns: 1,
+  completedRuns: 2,
 };
+
+// ─── Activity Feed ──────────────────────────────────────────
+
+export interface ActivityItem {
+  id: string;
+  type: 'run_complete' | 'outreach_sent' | 'import' | 'review' | 'approved';
+  title: string;
+  description: string;
+  timestamp: string;
+  relativeTime: string;
+}
+
+export const mockActivityFeed: ActivityItem[] = [
+  {
+    id: 'act-1',
+    type: 'run_complete',
+    title: 'EMEA — PKI / Certificate Solutions',
+    description: 'Prospecting run completed with 5 accounts prioritized',
+    timestamp: '2026-02-15T14:32:00Z',
+    relativeTime: '9 days ago',
+  },
+  {
+    id: 'act-2',
+    type: 'outreach_sent',
+    title: '3 outreach packs sent',
+    description: 'Acme Corp, Meridian Insurance, Gamma Financial Group',
+    timestamp: '2026-02-15T15:10:00Z',
+    relativeTime: '9 days ago',
+  },
+  {
+    id: 'act-3',
+    type: 'approved',
+    title: '4 accounts approved',
+    description: 'EMEA — PKI / Certificate Solutions run',
+    timestamp: '2026-02-15T14:45:00Z',
+    relativeTime: '9 days ago',
+  },
+  {
+    id: 'act-4',
+    type: 'run_complete',
+    title: 'NA — Identity & Access Management',
+    description: 'Prospecting run completed with 12 accounts prioritized',
+    timestamp: '2026-02-12T11:20:00Z',
+    relativeTime: '12 days ago',
+  },
+  {
+    id: 'act-5',
+    type: 'import',
+    title: '823 accounts imported',
+    description: 'APAC — Digital Signing',
+    timestamp: '2026-02-10T09:15:00Z',
+    relativeTime: '14 days ago',
+  },
+  {
+    id: 'act-6',
+    type: 'review',
+    title: 'APAC — Digital Signing in review',
+    description: '6 accounts flagged for manual review',
+    timestamp: '2026-02-10T10:00:00Z',
+    relativeTime: '14 days ago',
+  },
+];
+
+// ─── Top Prospects from Last Run ────────────────────────────
+
+export const mockTopProspects = [
+  { name: 'Acme Corp', score: 94, industry: 'Financial Services', contact: 'Jane Smith, CISO' },
+  { name: 'Meridian Insurance', score: 91, industry: 'Insurance', contact: 'Pierre Dubois, VP InfoSec' },
+  { name: 'Gamma Financial Group', score: 89, industry: 'Financial Services', contact: 'Klaus Weber, IT Director' },
+];
