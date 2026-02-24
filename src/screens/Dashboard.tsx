@@ -226,7 +226,7 @@ const useStyles = makeStyles({
     gap: '24px',
   },
 
-  /* ── Quick Actions ── */
+  /* ── Quick Actions  ── */ 
   quickActions: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
