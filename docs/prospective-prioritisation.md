@@ -269,13 +269,13 @@
 └──────────────────────────────────────────────────────────────┘
 ```
 
-**Fluent UI components:** `Card`, `Badge` (score), `ProgressBar` (factor bars), `MessageBar` (needs review warning), `Button`, `Tag`, `Pagination`
+**Fluent UI components:** `Card`, `Badge` (score), `ProgressBar` (factor bars), `MessageBar` (needs review warning), `Button`, `Tag`, `Pagination`, `Input`, `Textarea`, `Label` (inline edit form)
 
 **Key UX decisions:**
 - **Explainability is front and center** — every recommendation has a natural-language reasoning block. This directly addresses the "no explainability" pain point.
 - **Confidence score** is a composite number (0–100) with a breakdown bar chart per factor — makes it tangible for execs.
 - **"Needs Review" flag** for ambiguous CRM data (duplicate accounts, missing contacts) — human-in-the-loop, not black-box.
-- **Approve / Edit / Dismiss** per card — seller stays in control.
+- **Approve / Edit / Dismiss** per card — seller stays in control. Edit opens an inline form to modify contact name, title, email, and AI reasoning. Saving marks the card as "Edited" with options to Approve, Edit Again, or Dismiss. Approved/Dismissed cards show an Undo button to revert.
 
 ---
 
@@ -709,7 +709,7 @@ The Copilot Studio agent uses **two retrieval paths** at query time:
 ### Week 3: Hero Experience
 - [ ] Build Screen 4 (Recommendations) UI — cards, scores, explanations
 - [ ] Wire up agent API → React rendering pipeline
-- [ ] Implement approve/dismiss/edit interactions
+- [x] Implement approve/dismiss/edit interactions
 - [ ] Build "Needs Review" flag display + CRM disambiguation flow
 - [ ] Load test with 50–100 accounts through full pipeline
 

@@ -14,12 +14,17 @@ import {
   MessageBarTitle,
   Divider,
   CounterBadge,
+  Input,
+  Textarea,
+  Label,
 } from '@fluentui/react-components';
 import {
   ArrowLeft24Regular,
   Checkmark24Regular,
+  CheckmarkCircle24Regular,
   Dismiss24Regular,
   Edit24Regular,
+  Save24Regular,
   Warning16Filled,
   Person16Regular,
   Bot24Regular,
@@ -213,6 +218,26 @@ const useStyles = makeStyles({
   needsReviewWarning: {
     marginBottom: '12px',
   },
+  editForm: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '12px',
+    padding: '16px',
+    backgroundColor: tokens.colorNeutralBackground3,
+    borderRadius: '8px',
+    marginBottom: '12px',
+    border: `1px solid ${tokens.colorBrandStroke1}`,
+  },
+  editFormRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '12px',
+  },
+  editField: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '4px',
+  },
 });
 
 const PAGE_SIZE = 5;
@@ -223,6 +248,13 @@ const Recommendations: React.FC = () => {
   const activeRun = useActiveRun();
   const [filter, setFilter] = useState<string>('all');
   const [page, setPage] = useState(0);
+  const [editingRank, setEditingRank] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<{
+    contactName: string;
+    contactTitle: string;
+    contactEmail: string;
+    reasoning: string;
+  }>({ contactName: '', contactTitle: '', contactEmail: '', reasoning: '' });
 
   const recommendations = useMemo(() => activeRun?.recommendations ?? [], [activeRun?.recommendations]);
 
@@ -257,6 +289,41 @@ const Recommendations: React.FC = () => {
         payload: { runId: activeRun.id, rank, status },
       });
     }
+  };
+
+  const startEditing = (rec: AccountRecommendation) => {
+    setEditingRank(rec.rank);
+    setEditForm({
+      contactName: rec.bestContact.name,
+      contactTitle: rec.bestContact.title,
+      contactEmail: rec.bestContact.email ?? '',
+      reasoning: rec.reasoning,
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingRank(null);
+  };
+
+  const saveEdit = (rank: number) => {
+    if (activeRun) {
+      dispatch({
+        type: 'UPDATE_RECOMMENDATION',
+        payload: {
+          runId: activeRun.id,
+          rank,
+          updates: {
+            reasoning: editForm.reasoning,
+            bestContact: {
+              name: editForm.contactName,
+              title: editForm.contactTitle,
+              email: editForm.contactEmail || null,
+            },
+          },
+        },
+      });
+    }
+    setEditingRank(null);
   };
 
   const handleGenerateOutreach = () => {
@@ -481,18 +548,125 @@ const Recommendations: React.FC = () => {
             </div>
           )}
 
+          {/* Inline Edit Form */}
+          {editingRank === rec.rank && (
+            <div className={styles.editForm}>
+              <Text size={400} weight="semibold" style={{ color: tokens.colorBrandForeground1 }}>
+                Edit Recommendation
+              </Text>
+              <div className={styles.editFormRow}>
+                <div className={styles.editField}>
+                  <Label htmlFor={`edit-name-${rec.rank}`}>Contact Name</Label>
+                  <Input
+                    id={`edit-name-${rec.rank}`}
+                    value={editForm.contactName}
+                    onChange={(_, data) => setEditForm((f) => ({ ...f, contactName: data.value }))}
+                  />
+                </div>
+                <div className={styles.editField}>
+                  <Label htmlFor={`edit-title-${rec.rank}`}>Contact Title</Label>
+                  <Input
+                    id={`edit-title-${rec.rank}`}
+                    value={editForm.contactTitle}
+                    onChange={(_, data) => setEditForm((f) => ({ ...f, contactTitle: data.value }))}
+                  />
+                </div>
+              </div>
+              <div className={styles.editField}>
+                <Label htmlFor={`edit-email-${rec.rank}`}>Contact Email</Label>
+                <Input
+                  id={`edit-email-${rec.rank}`}
+                  type="email"
+                  value={editForm.contactEmail}
+                  onChange={(_, data) => setEditForm((f) => ({ ...f, contactEmail: data.value }))}
+                  placeholder="email@company.com"
+                />
+              </div>
+              <div className={styles.editField}>
+                <Label htmlFor={`edit-reasoning-${rec.rank}`}>Notes / Reasoning</Label>
+                <Textarea
+                  id={`edit-reasoning-${rec.rank}`}
+                  value={editForm.reasoning}
+                  onChange={(_, data) => setEditForm((f) => ({ ...f, reasoning: data.value }))}
+                  rows={3}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <Button appearance="subtle" size="small" onClick={cancelEditing}>
+                  Cancel
+                </Button>
+                <Button
+                  appearance="primary"
+                  size="small"
+                  icon={<Save24Regular />}
+                  onClick={() => saveEdit(rec.rank)}
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Actions */}
           <Divider />
           <div className={styles.actionRow}>
             {rec.status === 'approved' ? (
-              <Badge appearance="filled" color="success" size="large">
-                Approved
-              </Badge>
+              <>
+                <Badge appearance="filled" color="success" size="large">
+                  Approved
+                </Badge>
+                <Button
+                  appearance="subtle"
+                  size="small"
+                  onClick={() => updateStatus(rec.rank, 'pending')}
+                >
+                  Undo
+                </Button>
+              </>
             ) : rec.status === 'dismissed' ? (
-              <Badge appearance="filled" color="danger" size="large">
-                Dismissed
-              </Badge>
-            ) : (
+              <>
+                <Badge appearance="filled" color="danger" size="large">
+                  Dismissed
+                </Badge>
+                <Button
+                  appearance="subtle"
+                  size="small"
+                  onClick={() => updateStatus(rec.rank, 'pending')}
+                >
+                  Undo
+                </Button>
+              </>
+            ) : rec.status === 'edited' ? (
+              <>
+                <Badge appearance="filled" color="informative" size="large" icon={<CheckmarkCircle24Regular />}>
+                  Edited
+                </Badge>
+                <Button
+                  appearance="primary"
+                  size="small"
+                  icon={<Checkmark24Regular />}
+                  onClick={() => updateStatus(rec.rank, 'approved')}
+                >
+                  Approve
+                </Button>
+                <Button
+                  appearance="outline"
+                  size="small"
+                  icon={<Edit24Regular />}
+                  onClick={() => startEditing(rec)}
+                >
+                  Edit Again
+                </Button>
+                <Button
+                  appearance="subtle"
+                  size="small"
+                  icon={<Dismiss24Regular />}
+                  onClick={() => updateStatus(rec.rank, 'dismissed')}
+                >
+                  Dismiss
+                </Button>
+              </>
+            ) : editingRank === rec.rank ? null : (
               <>
                 <Button
                   appearance="primary"
@@ -506,7 +680,7 @@ const Recommendations: React.FC = () => {
                   appearance="outline"
                   size="small"
                   icon={<Edit24Regular />}
-                  onClick={() => updateStatus(rec.rank, 'edited')}
+                  onClick={() => startEditing(rec)}
                 >
                   Edit
                 </Button>

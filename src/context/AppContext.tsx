@@ -32,6 +32,7 @@ type Action =
   | { type: 'SET_RUN_CONFIG'; payload: { runId: string; config: RunConfig } }
   | { type: 'SET_RECOMMENDATIONS'; payload: { runId: string; recommendations: AccountRecommendation[] } }
   | { type: 'UPDATE_RECOMMENDATION_STATUS'; payload: { runId: string; rank: number; status: AccountRecommendation['status'] } }
+  | { type: 'UPDATE_RECOMMENDATION'; payload: { runId: string; rank: number; updates: Partial<Pick<AccountRecommendation, 'accountName' | 'reasoning'> & { bestContact: Partial<AccountRecommendation['bestContact']> }> } }
   | { type: 'SET_OUTREACH_DRAFTS'; payload: { runId: string; drafts: OutreachDraft[] } }
   | { type: 'SET_RUN_STATUS'; payload: { runId: string; status: ProspectingRun['status'] } };
 
@@ -85,6 +86,30 @@ function appReducer(state: AppState, action: Action): AppState {
                 ...r,
                 recommendations: r.recommendations?.map((rec) =>
                   rec.rank === action.payload.rank ? { ...rec, status: action.payload.status } : rec
+                ),
+              }
+            : r
+        ),
+      };
+    case 'UPDATE_RECOMMENDATION':
+      return {
+        ...state,
+        runs: state.runs.map((r) =>
+          r.id === action.payload.runId
+            ? {
+                ...r,
+                recommendations: r.recommendations?.map((rec) =>
+                  rec.rank === action.payload.rank
+                    ? {
+                        ...rec,
+                        ...action.payload.updates,
+                        bestContact: {
+                          ...rec.bestContact,
+                          ...(action.payload.updates.bestContact ?? {}),
+                        },
+                        status: 'edited' as const,
+                      }
+                    : rec
                 ),
               }
             : r
