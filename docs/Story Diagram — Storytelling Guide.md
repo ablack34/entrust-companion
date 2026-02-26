@@ -56,6 +56,12 @@ journey
       Click into records one by one: 1: Sarah
       Search for CISOs and IT Directors: 2: Sarah
       Check if contacts are current: 1: Sarah
+    section Contact Gaps
+      Promising account but no contact in CRM: 1: Sarah
+      Open LinkedIn Sales Navigator in new tab: 2: Sarah
+      Search by company and title manually: 1: Sarah
+      Copy contact details into spreadsheet: 1: Sarah
+      Repeat for every account with missing contacts: 1: Sarah
     section The Scoring Gap
       No systematic scoring method: 1: Sarah
       Rely on gut feel and tribal knowledge: 2: Sarah
@@ -101,7 +107,14 @@ flowchart TD
     No way to answer: which of 1,247
     have a known buyer in CRM?`"]
 
-    PERSONA --> SCORING["`📉 **No Real Scoring**
+    PERSONA --> LINKEDIN["`🔍 **LinkedIn Sales Navigator**
+    Account looks promising but
+    no buyer contact in Salesforce?
+    Open Sales Navigator, search
+    by company + title, copy details
+    back to spreadsheet. _Repeat._`"]
+
+    LINKEDIN --> SCORING["`📉 **No Real Scoring**
     Gut feel + tribal knowledge
     Financial Services 'seems strong'
     'Suspects' don't build pipeline`"]
@@ -124,6 +137,7 @@ flowchart TD
     style CSV fill:#fff3e0,stroke:#e65100
     style XREF fill:#fce4ec,stroke:#c62828
     style PERSONA fill:#fce4ec,stroke:#c62828
+    style LINKEDIN fill:#fce4ec,stroke:#c62828
     style SCORING fill:#fce4ec,stroke:#c62828
     style DUPES fill:#fff8e1,stroke:#f57f17
     style OUTREACH fill:#fce4ec,stroke:#c62828
@@ -160,6 +174,11 @@ journey
       Acme Corp Score 94 — Approve: 5: Sarah
       Meridian Insurance Score 91 — Approve: 5: Sarah
       Beta Holdings Score 87 — Flag for review: 4: Sarah
+    section Contact Enrichment
+      Nordic Secure has no CRM contact: 4: Sarah
+      Click Find on LinkedIn Sales Navigator: 5: Sarah
+      Pre-scoped search opens instantly: 5: Sarah
+      Add contact via Edit flow: 5: Sarah
     section Outreach
       Generate personalized outreach packs: 5: Sarah
       Edit one word and copy to Outlook: 5: Sarah
@@ -251,6 +270,12 @@ flowchart TD
         'Beta Holdings Ltd' vs 'Group'
         Shared domain, different records
         Contact email missing`"]
+
+        ACC5["`🔍 **Nordic Secure Systems — 82/100**
+        NO CRM CONTACT
+        AI recommends: target CISO
+        [Find on LinkedIn Sales Navigator]
+        Pre-scoped search, one click`"]
     end
 
     RECS --> ACCOUNTS
@@ -261,6 +286,10 @@ flowchart TD
     ACTION -->|Approve| APPROVED["✅ Approved for Outreach"]
     ACTION -->|Flag| FLAGGED["🔍 Flagged for Review"]
     ACTION -->|Dismiss| DISMISSED["❌ Dismissed"]
+    ACTION -->|Enrich| LINKEDIN["🔗 Open LinkedIn Sales Navigator\nPre-scoped search by\ncompany + persona title"]
+
+    LINKEDIN --> EDIT["✏️ Add contact details\nvia Edit flow on card"]
+    EDIT --> APPROVED
 
     APPROVED --> OUTREACH_PACK["`📨 **Generate Outreach Pack**
     Personalized emails per account
@@ -321,7 +350,10 @@ flowchart LR
         found mid-deal`"]
         B5["`🔒 **Opaque Decisions**
         no audit trail`"]
-        B1 ~~~ B2 ~~~ B3 ~~~ B4 ~~~ B5
+        B6["`🔍 **Manual Contact Hunting**
+        LinkedIn Sales Nav tab-switching
+        copy-paste into spreadsheets`"]
+        B1 ~~~ B2 ~~~ B3 ~~~ B4 ~~~ B5 ~~~ B6
     end
 
     subgraph AFTER["🟢 AFTER — With Companion"]
@@ -336,7 +368,10 @@ flowchart LR
         flagged proactively`"]
         A5["`📋 **Auditable Reasoning**
         every recommendation explained`"]
-        A1 ~~~ A2 ~~~ A3 ~~~ A4 ~~~ A5
+        A6["`🔗 **Guided Contact Enrichment**
+        AI tells you who to find;
+        one-click Sales Navigator search`"]
+        A1 ~~~ A2 ~~~ A3 ~~~ A4 ~~~ A5 ~~~ A6
     end
 
     BEFORE ---> AFTER
@@ -417,6 +452,7 @@ flowchart TD
 | **The Walkthrough** | Companion Workflow | Step-by-step through the tool | Building excitement |
 | **The Hero Moment** | Account Cards in Workflow | AI shows its reasoning | "The part that got me" |
 | **The CRM Save** | Beta Holdings (amber card) | Human-in-the-loop, not black box | Trust |
-| **The Transformation** | Before vs. After | Days → Minutes, gut → data | Impact |
+| **The Contact Bridge** | Nordic Secure (Sales Nav link) | AI tells you who to find, not just where to look | Practical value |
+| **The Transformation** | Before vs. After | Days → Minutes, gut → data, manual hunting → guided search | Impact |
 | **The Scale** | Scaling the Pattern | One prototype → entire org | Strategic vision |
 | **The Close** | Roadmap | What's built, what's next | Forward momentum |

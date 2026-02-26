@@ -35,6 +35,7 @@ import {
   QuestionCircle16Regular,
   Link16Regular,
   MailWarning16Regular,
+  PeopleSearch20Regular,
 } from '@fluentui/react-icons';
 import { useApp, useActiveRun } from '../context/AppContext';
 import { AccountRecommendation } from '../types';
@@ -201,6 +202,25 @@ const useStyles = makeStyles({
     color: tokens.colorNeutralForeground3,
     lineHeight: '1.4',
     marginTop: '4px',
+  },
+  linkedinButton: {
+    marginTop: '8px',
+    backgroundColor: '#0A66C2',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '6px 14px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    textDecoration: 'none',
+    transition: 'background-color 0.15s',
+    '&:hover': {
+      backgroundColor: '#004182',
+    },
   },
   footer: {
     display: 'flex',
@@ -466,6 +486,11 @@ const Recommendations: React.FC = () => {
                 Email not available
               </Badge>
             )}
+            {rec.bestContact.enrichmentAction === 'linkedin_search_recommended' && (
+              <Badge appearance="outline" color="informative" size="small" icon={<PeopleSearch20Regular />}>
+                Sales Navigator lookup recommended
+              </Badge>
+            )}
           </div>
 
           {/* Contact Discovery Provenance */}
@@ -513,6 +538,17 @@ const Recommendations: React.FC = () => {
               <Text className={styles.discoveryNote}>
                 {rec.bestContact.discoveryNote}
               </Text>
+              {rec.bestContact.enrichmentAction === 'linkedin_search_recommended' && rec.bestContact.linkedinSearchUrl && (
+                <a
+                  href={rec.bestContact.linkedinSearchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.linkedinButton}
+                >
+                  <PeopleSearch20Regular />
+                  Find on LinkedIn Sales Navigator
+                </a>
+              )}
             </div>
           </div>
 

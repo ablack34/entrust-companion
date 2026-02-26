@@ -49,6 +49,7 @@ export interface ScoringFactors {
 
 export type ContactSource = 'salesforce' | 'goodfit' | 'inferred' | 'none';
 export type ContactDiscovery = 'matched' | 'partial' | 'inferred' | 'not-found';
+export type EnrichmentAction = 'none' | 'linkedin_search_recommended';
 
 export interface BestContact {
   name: string;
@@ -60,6 +61,10 @@ export interface BestContact {
   discovery: ContactDiscovery;
   /** Human-readable explanation of how we found this contact */
   discoveryNote: string;
+  /** Whether the seller should enrich this contact via LinkedIn Sales Navigator */
+  enrichmentAction: EnrichmentAction;
+  /** Pre-built LinkedIn Sales Navigator search URL for missing/incomplete contacts */
+  linkedinSearchUrl: string | null;
 }
 
 export interface AccountRecommendation {

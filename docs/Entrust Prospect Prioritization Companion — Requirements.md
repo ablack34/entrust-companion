@@ -13,6 +13,7 @@
 | 2 | Goodfit as third-party data provider delivering 40,000+ account lists | Act 1 ¶1–2 | `mockDashboardStats.totalImported = 40127` | ✅ Met |
 | 3 | Sellers manually cross-reference accounts against Salesforce CRM (existing relationships, open opps, buyer contacts) | Act 1 ¶4 | — | ✅ Met |
 | 4 | Persona-to-account mapping is entirely manual (CISO, IT Director, IAM Lead) | Act 1 ¶5 | `defaultPersonas` in ConfigureRules.tsx | ✅ Met |
+| 4a | When buyer contacts are missing from CRM, sellers manually search LinkedIn Sales Navigator to retrieve contact information | Act 1 ¶5 | — | ✅ Met |
 | 5 | No systematic scoring or ranking — gut feel, tribal knowledge | Act 1 ¶6 | — | ✅ Met |
 | 6 | Account hierarchy data in Salesforce is messy — duplicate records, parent/child confusion, stale contacts | Act 1 ¶7 | Beta Holdings "Ltd" vs "Group" in mockData.ts | ✅ Met |
 | 7 | Outreach is generic — template emails, no personalization | Act 1 ¶8 | — | ✅ Met |
@@ -34,6 +35,7 @@
 | 14 | Microsoft Graph Connectors indexing Salesforce CRM data (Accounts, Contacts, Leads, Opportunities) — read-only, item-level ACLs | Act 2 ¶5 | Processing animation messages in ConfigureRules.tsx | ✅ Met |
 | 15 | Goodfit CSV data staged in SharePoint list, queryable via Graph API | Act 2 ¶3 | ImportAccounts.tsx SharePoint list dropdown | ✅ Met |
 | 16 | Outlook integration for outreach handoff | Act 2 ¶10 | `handleOpenInOutlook` → `mailto:` in OutreachPack.tsx | ✅ Met |
+| 16a | LinkedIn Sales Navigator integration for contact enrichment — deep links to pre-scoped searches when CRM contacts are missing or incomplete | Act 2 ¶6–7 | Documented in prospective-prioritisation.md; agent generates `linkedin_search_url`; UI renders "Find on LinkedIn Sales Navigator" button | ✅ Met |
 
 ### 5-Step User Workflow
 
@@ -51,6 +53,7 @@
 | 26 | **RECOMMENDATIONS** — natural-language reasoning for every recommendation | Act 2 ¶6–8 | `reasoning` field rendered in AI Reasoning block with Bot icon | ✅ Met |
 | 27 | **RECOMMENDATIONS** — example reasoning: "Acme Corp scores 94: CISO present in CRM, 5,200 employees, expiring Symantec cert Q2 2026, no existing Entrust relationship" | Act 2 ¶6 | `mockRecommendations[0].reasoning` — exact content match | ✅ Met |
 | 28 | **RECOMMENDATIONS** — "Needs Review" flags when CRM data is ambiguous (e.g. duplicate Salesforce records) | Act 2 ¶9 | `needsReview` + `reviewReason` + amber-bordered card style | ✅ Met |
+| 28a | **RECOMMENDATIONS** — "Find on LinkedIn Sales Navigator" deep link when recommended contact is missing or has incomplete data (no email) | Act 2 ¶6–7 | `enrichment_action` + `linkedin_search_url` in agent response; UI renders Sales Navigator CTA | ✅ Met |
 | 29 | **RECOMMENDATIONS** — example: "Beta Holdings Ltd" vs "Beta Holdings Group" duplicate flag | Act 2 ¶9 | `mockRecommendations[3].reviewReason` — exact content match | ✅ Met |
 | 30 | **RECOMMENDATIONS** — Approve / Edit / Dismiss controls — human-in-the-loop, never black-box | Act 2 ¶10 | Three action buttons in Recommendations.tsx | ✅ Met |
 | 31 | **OUTREACH PACK** — AI-generated personalized draft emails referencing specific account data points | Act 2 ¶10 | `mockOutreachDrafts` with full email bodies + `personalizationNotes` | ✅ Met |
@@ -83,6 +86,7 @@
 | 46 | Roadmap: Fabric analytics | Act 3 ¶8 | ✅ Met |
 | 47 | Roadmap: Teams / M365 Copilot front door | Act 3 ¶8 | ✅ Met |
 | 48 | Roadmap: Real Goodfit API integration | Act 3 ¶8 | ✅ Met |
+| 48a | Roadmap: LinkedIn Sales Navigator API integration (automated contact import) | Act 3 ¶8 | ✅ Met |
 | 49 | Forward-looking statement: not just EMEA PKI, but every product line, every region, every seller | Act 3 ¶9–10 | ✅ Met |
 
 ---
@@ -106,10 +110,10 @@
 
 | Category | Total | Met | Partial | Gap |
 |---|---|---|---|---|
-| Act 1 — The Problem | 10 | 10 | 0 | 0 |
-| Act 2 — The Solution | 27 | 26 | 1 | 0 |
-| Act 3 — Business Impact | 12 | 12 | 0 | 0 |
+| Act 1 — The Problem | 11 | 11 | 0 | 0 |
+| Act 2 — The Solution | 30 | 29 | 1 | 0 |
+| Act 3 — Business Impact | 13 | 13 | 0 | 0 |
 | Style Guidelines | 8 | 8 | 0 | 0 |
-| **Total** | **57** | **56** | **1** | **0** |
+| **Total** | **62** | **61** | **1** | **0** |
 
 **One partial gap:** Requirement #33 (CSV export in outreach pack) — the feature exists in code but is not explicitly referenced in the story narrative.

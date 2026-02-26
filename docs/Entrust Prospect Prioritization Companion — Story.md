@@ -15,6 +15,8 @@ When that Goodfit list lands, Sarah's real work begins. She opens Salesforce in 
 
 The persona-to-account mapping is entirely manual. Sarah knows she's looking for CISOs, IT Directors, and Identity & Access Management leads — these are the buyers who sign off on PKI investments. But figuring out which of the 1,247 companies actually have those personas in Salesforce, and whether the contact data is current, means clicking into records one by one. There's no systematic way to answer: *Of these 1,247 accounts, which ones already have a known buyer contact in our CRM?*
 
+And when the answer is "no" — when Sarah finds an account that looks promising but has no buyer contact in Salesforce — the next step is LinkedIn Sales Navigator. She opens yet another browser tab, searches for the company, filters by title, scrolls through results, and copies contact details back into her working spreadsheet. It's the part of the process nobody talks about in CRM strategy decks, but it consumes hours of every prospecting cycle. The AI can tell her *which* accounts to pursue, but without a bridge to *who* to contact, she's still manually hunting for people on LinkedIn.
+
 There's no scoring either — not really. Sarah relies on gut feel, tribal knowledge, and whatever research she can squeeze between pipeline reviews. She knows Financial Services is a strong vertical for PKI. She suspects insurance companies undergoing digital transformation are good targets. But "suspects" doesn't build pipeline, and gut feel doesn't scale across 1,247 accounts.
 
 Then there's the CRM itself. Sarah's Salesforce instance is a monument to years of accumulated data entropy. Beta Holdings appears twice — once as "Beta Holdings Ltd" with three contacts and a closed-lost opportunity from 2023, and again as "Beta Holdings Group" with eight contacts and no opportunity history. Which one is the real account? Are the contacts duplicated? Sarah doesn't know, and she doesn't have time to find out, so Beta Holdings goes into the "maybe later" pile.
@@ -25,7 +27,7 @@ The outreach that eventually results from this process is, inevitably, generic. 
 
 By the time Sarah has worked through the list, identified her top prospects, cleaned up enough CRM data to feel confident, and drafted personalized outreach for a couple of dozen accounts — two weeks have passed. The buying window for some of those accounts has already narrowed. The competitive landscape has shifted. And another Goodfit list is on its way.
 
-This isn't a failure of effort or skill. This is a systems problem. Sarah has all the data she needs — it's just scattered across Salesforce, Goodfit exports, and her own institutional memory, with no intelligence layer connecting them.
+This isn't a failure of effort or skill. This is a systems problem. Sarah has all the data she needs — it's just scattered across Salesforce, Goodfit exports, LinkedIn Sales Navigator, and her own institutional memory, with no intelligence layer connecting them.
 
 ---
 
@@ -54,6 +56,8 @@ Account #1: **Acme Corp — Score 94/100.** The AI reasoning is specific and gro
 Account #2: **Meridian Insurance — Score 91/100.** Pierre Dubois, VP of Information Security, is the recommended contact. The reasoning highlights what Sarah would have taken an hour to piece together: a digital transformation initiative, an expected RFP for identity platform in H2 2026, and a dormant Salesforce lead from 2024. The AI doesn't just score the account — it tells her *why* this account deserves her attention right now.
 
 Account #3: **Gamma Financial Group — Score 89/100.** Klaus Weber, IT Director, is the contact. The reasoning references EU digital identity regulation driving PKI investment across German financial institutions — and flags that Salesforce shows a previous demo request from 2025 that went cold. This is a re-engagement opportunity with a timely regulatory angle, and the AI has connected those dots automatically.
+
+Account #5 reveals a different kind of intelligence. **Nordic Secure Systems — Score 82/100.** The account scores well on industry relevance and company size, but there is no buyer contact in Salesforce at all. In the old workflow, Sarah would have moved on or opened LinkedIn Sales Navigator and spent ten minutes guessing which title to search for. The Companion handles this differently: it identifies that the highest-priority persona to target is a CISO based on Nordic's profile and Sarah's configured weights, and presents a "Find on LinkedIn Sales Navigator" button—a deep link that opens a pre-scoped Sales Navigator search for CISOs at Nordic Secure Systems. Sarah clicks, finds the CISO in seconds, and adds the contact details back into the recommendation card via the Edit flow. The AI didn't just tell her the account was worth pursuing; it told her exactly *who* to look for and gave her a one-click path to find them.
 
 **Then Sarah hits Account #4, and the Companion earns its keep in a different way.**
 

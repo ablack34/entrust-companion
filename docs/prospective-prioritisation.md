@@ -32,10 +32,12 @@
 | **SharePoint staging layer (Goodfit list)** | ✅ BUILD | Upload CSV → SharePoint list via Power Automate; agent reads via Graph |
 | **Outreach pack export (CSV + messaging blocks)** | ✅ BUILD | Agent generates draft messaging; UI bundles into downloadable pack |
 | **Outlook handoff (deep link / Copilot in Outlook prompt)** | 🟡 MOCK+LINK | Deep-link to Outlook compose with pre-filled subject/body; reference "Copilot in Outlook" for polish |
+| **LinkedIn Sales Navigator contact enrichment** | 🟡 MOCK+LINK | Sellers retrieve buyer contact info from LinkedIn Sales Navigator; prototype shows deep links to pre-built Sales Navigator searches + mock contact enrichment data; real API integration is v2 |
 | **CRM write-back** | 🔴 DEFER | Explicitly roadmap — mention in narrative but do not build |
 | **Fabric analytics / dashboards** | 🔴 DEFER | Future enrichment layer — position in architecture slide only |
 | **Teams / M365 Copilot chat front door** | 🔴 DEFER | Nice-to-have; standalone web app is the primary surface |
 | **Real Goodfit API integration** | 🔴 DEFER | Use exported CSV for prototype; API integration is a v2 item |
+| **LinkedIn Sales Navigator API integration** | 🔴 DEFER | Full API-driven contact lookup and import is a v2 item; prototype uses deep links + mock enrichment data |
 | **Multi-region / multi-segment rules engine** | 🟡 MOCK | Hardcode EMEA + 2 segments; show the UI for more |
 
 ### What "Mock" means in this prototype
@@ -43,6 +45,7 @@
 - **Mock data**: Realistic synthetic Salesforce records (50–100 accounts, 200–400 contacts) loaded into a SharePoint list and/or indexed via the Salesforce sandbox connector.
 - **Mock logic**: Where the agent can't yet do full scoring (e.g., hierarchy disambiguation), return hard-coded "needs review" flags with plausible explanations.
 - **Mock integration**: Outlook handoff uses `mailto:` deep links with pre-filled content; the narrative says "Copilot in Outlook takes it from here."
+- **Mock contact enrichment**: When a recommended account has no buyer contact in Salesforce, the Companion generates a LinkedIn Sales Navigator deep-link search (pre-built from account name, domain, and target persona titles) and shows mock enrichment results simulating what a seller would retrieve. The narrative says "Sales Navigator provides the contact; the Companion tells you who to look for and why."
 
 ---
 
@@ -225,6 +228,7 @@
 │  │                                                        │  │
 │  │  👤 Best contact: Jane Smith, CISO                     │  │
 │  │     jane.smith@acme.com · LinkedIn                     │  │
+│  │     🟢 Source: Salesforce CRM                          │  │
 │  │                                                        │  │
 │  │  🤖 AI Reasoning:                                      │  │
 │  │  "Acme Corp is a strong persona fit (CISO present in   │  │
@@ -245,6 +249,8 @@
 │  │     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │  │
 │  │                                                        │  │
 │  │  👤 Best contact: Mark Lee, IT Director                │  │
+│  │     🟡 Source: Salesforce (email missing)               │  │
+│  │     [🔍 Find on LinkedIn Sales Navigator]              │  │
 │  │                                                        │  │
 │  │  🤖 AI Reasoning:                                      │  │
 │  │  "Beta Holdings recently consolidated IT operations    │  │
@@ -275,6 +281,7 @@
 - **Explainability is front and center** — every recommendation has a natural-language reasoning block. This directly addresses the "no explainability" pain point.
 - **Confidence score** is a composite number (0–100) with a breakdown bar chart per factor — makes it tangible for execs.
 - **"Needs Review" flag** for ambiguous CRM data (duplicate accounts, missing contacts) — human-in-the-loop, not black-box.
+- **Contact enrichment via LinkedIn Sales Navigator**: When a recommended contact has missing or incomplete data (e.g., no email), the card shows a "Find on LinkedIn Sales Navigator" deep link. The link opens a pre-built Sales Navigator search scoped to the account’s company domain and the target persona title (e.g., "IT Director" at "Beta Holdings"). For the prototype, accounts with no CRM contacts show the AI’s inferred best persona title with a Sales Navigator lookup CTA instead of a blank contact card.
 - **Approve / Edit / Dismiss** per card — seller stays in control. Edit opens an inline form to modify contact name, title, email, and AI reasoning. Saving marks the card as "Edited" with options to Approve, Edit Again, or Dismiss. Approved/Dismissed cards show an Undo button to revert.
 
 ---
@@ -402,7 +409,10 @@ For each recommended account, return a JSON object:
     "name": "<string>",
     "title": "<string>",
     "email": "<string or null>",
-    "source": "salesforce | goodfit | inferred"
+    "linkedin_url": "<string or null>",
+    "source": "salesforce | goodfit | inferred",
+    "enrichment_action": "none | linkedin_search_recommended",
+    "linkedin_search_url": "<string or null — pre-built Sales Navigator search URL>"
   },
   "reasoning": "<2-4 sentence natural language explanation>",
   "needs_review": <boolean>,
@@ -448,16 +458,33 @@ Instructions:
    flag as "needs_review" and describe the ambiguity.
 3. For matched accounts, find Contacts whose titles align with the target personas.
    Rank contacts by persona priority weight.
-4. Score each account using the weighted factors above. The overall_score is a
+4. If a matching contact is found but has incomplete data (e.g., missing email,
+   stale title), flag it and set enrichment_action to "linkedin_search_recommended".
+   Generate a LinkedIn Sales Navigator search URL scoped to the account's company
+   and the target persona title.
+5. If NO matching contact is found in Salesforce for a high-priority account, infer
+   the best persona title to target based on the account's profile and the seller's
+   persona priorities. Set source to "inferred", set enrichment_action to
+   "linkedin_search_recommended", and generate the Sales Navigator search URL.
+   Include a note in the reasoning explaining that the contact was inferred and
+   recommending the seller verify via LinkedIn Sales Navigator.
+6. Score each account using the weighted factors above. The overall_score is a
    weighted average.
-5. Sort accounts by overall_score descending.
-6. Return the top {{result_count}} accounts in the JSON format specified in your
+7. Sort accounts by overall_score descending.
+8. Return the top {{result_count}} accounts in the JSON format specified in your
    instructions.
 
 Important:
 - If no Salesforce match is found, still include the account but set crm_signals
   to 0 and note "No CRM history" in the reasoning.
 - If a contact's email is not in Salesforce, set email to null and note the gap.
+  Set enrichment_action to "linkedin_search_recommended" and generate a
+  Sales Navigator search URL using the pattern:
+  https://www.linkedin.com/sales/search/people?query=(companyName:{{account_name}})AND(title:{{persona_title}})
+- For accounts where no contact exists in Salesforce at all, always still include
+  the account if it scores well on other factors. Infer the best persona title to
+  target and provide the Sales Navigator search link. A missing contact does not
+  disqualify an otherwise high-fit account.
 - Be specific in reasoning — reference actual data points, not vague statements.
 ```
 
@@ -535,6 +562,7 @@ Please analyze these records and:
 | **Grounding constraints** | All tasks | "NEVER fabricate data" + "reference actual data points" prevents hallucination in customer-facing output |
 | **Escalation to human** | Tasks A & C | "If uncertain, flag for review" keeps the prototype credible and enterprise-safe |
 | **Persona-aware tone** | Task B | Outreach drafts use role-specific hooks instead of generic templates |
+| **Contact enrichment bridging** | Tasks A & B | When CRM contacts are missing or incomplete, the agent generates LinkedIn Sales Navigator search URLs to bridge the gap — preserving the seller's existing manual lookup workflow while eliminating the guesswork about *who* to search for |
 
 ---
 
@@ -585,7 +613,23 @@ Please analyze these records and:
                     │  → Export outreach packs          │
                     │  → Handoff to Outlook             │
                     └──────────────────────────────────┘
+                                   │
+            ┌──────────────────────┼──────────────────────┐
+            │ (contact gaps)       │                      │
+            ▼                      ▼                      ▼
+  ┌───────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+  │  LinkedIn Sales    │  │  Outlook        │  │  CSV / Pack     │
+  │  Navigator         │  │  (mailto deep   │  │  Export         │
+  │  (deep link to     │  │   link handoff) │  │                 │
+  │  pre-built search) │  │                 │  │                 │
+  │                    │  │                 │  │                 │
+  │  Seller retrieves  │  │                 │  │                 │
+  │  missing contact   │  │                 │  │                 │
+  │  info manually     │  │                 │  │                 │
+  └───────────────────┘  └─────────────────┘  └─────────────────┘
 ```
+
+> **Contact enrichment note:** When the agent identifies a high-priority account but cannot find a matching buyer contact in Salesforce (or finds a contact with incomplete data — e.g., missing email), the React app generates a LinkedIn Sales Navigator deep link. This link opens a pre-scoped search using the account's company name/domain and the target persona title (e.g., "CISO at Acme Corp"). The seller retrieves the contact information from Sales Navigator and manually enters it via the Edit flow on the recommendation card. This mirrors the seller's existing workflow but removes the guesswork about *which* persona to search for and *why* — the AI has already determined the account is worth pursuing and which role to target.
 
 ### 4.2 SharePoint Staging Layer — Schema
 
@@ -646,7 +690,8 @@ The Copilot Studio agent uses **two retrieval paths** at query time:
 **Merge logic (in the agent's reasoning):**
 - The agent receives both data sets in its context window
 - Scoring is done by the LLM based on the prompt template (Section 3.2, Task A)
-- The agent outputs structured JSON that the React app parses and renders 
+- The agent outputs structured JSON that the React app parses and renders
+- **Contact gap handling:** When the agent identifies a recommended account with no CRM contact (or incomplete contact data), it sets `enrichment_action: "linkedin_search_recommended"` and generates a LinkedIn Sales Navigator deep-link URL. The React app renders this as a "Find on LinkedIn Sales Navigator" button on the recommendation card, directing the seller to a pre-scoped search for the right persona at the right company. This bridges the gap between AI-driven prioritization and the manual contact retrieval workflow sellers already use.
 
 **Prototype simplification:**
 - For the demo, pre-load 50–100 accounts into the SharePoint list and ensure matching Salesforce sandbox records exist
@@ -739,4 +784,4 @@ The Copilot Studio agent uses **two retrieval paths** at query time:
 | **CSV parsing** | Papa Parse (client-side) | Zero-dependency, handles large CSVs in browser |
 | **Hosting** | Azure Static Web Apps | Free tier; CI/CD from GitHub; custom domain support |
 | **Auth** | MSAL.js (Microsoft Entra ID) | SSO with M365; required for Graph API calls |
-| **Outlook integration** | `mailto:` URI scheme (v1); Graph `sendMail` API (v2) | mailto is instant for prototype; Graph API for production |
+| **Outlook integration** | `mailto:` URI scheme (v1); Graph `sendMail` API (v2) | mailto is instant for prototype; Graph API for production |\n| **Contact enrichment** | LinkedIn Sales Navigator deep links (v1); Sales Navigator API (v2) | Deep links to pre-scoped searches are zero-integration for prototype; API enables automated contact import in production |
