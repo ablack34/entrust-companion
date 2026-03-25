@@ -1,6 +1,7 @@
 import React from 'react';
 import { FluentProvider, webLightTheme, makeStyles, tokens } from '@fluentui/react-components';
 import { AppProvider, useApp } from './context/AppContext';
+import PasswordGate from './components/PasswordGate';
 import AppHeader from './components/AppHeader';
 import Dashboard from './screens/Dashboard';
 import ImportAccounts from './screens/ImportAccounts';
@@ -45,9 +46,11 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <FluentProvider theme={webLightTheme}>
-      <AppProvider>
-        <AppContent />
-      </AppProvider>
+      <PasswordGate>
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </PasswordGate>
     </FluentProvider>
   );
 }
