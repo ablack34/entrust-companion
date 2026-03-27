@@ -6,9 +6,15 @@ import {
   Avatar,
   ToolbarButton,
   Tooltip,
+  Menu,
+  MenuTrigger,
+  MenuPopover,
+  MenuList,
+  MenuItem,
 } from '@fluentui/react-components';
-import { Home24Regular } from '@fluentui/react-icons';
+import { Home24Regular, DocumentBulletList24Regular } from '@fluentui/react-icons';
 import { useApp } from '../context/AppContext';
+import { docsRegistry } from '../data/docsRegistry';
 
 const useStyles = makeStyles({
   header: {
@@ -62,6 +68,28 @@ const AppHeader: React.FC = () => {
         <Text className={styles.logo}>Entrust Prospect Prioritization Companion</Text>
       </div>
       <div className={styles.right}>
+        <Menu>
+          <MenuTrigger disableButtonEnhancement>
+            <Tooltip content="Documentation" relationship="label">
+              <ToolbarButton
+                icon={<DocumentBulletList24Regular style={{ color: tokens.colorNeutralForegroundOnBrand }} />}
+                style={{ minWidth: 'auto' }}
+              />
+            </Tooltip>
+          </MenuTrigger>
+          <MenuPopover>
+            <MenuList>
+              {docsRegistry.map((doc) => (
+                <MenuItem
+                  key={doc.slug}
+                  onClick={() => dispatch({ type: 'SHOW_DOC', payload: doc.slug })}
+                >
+                  {doc.title}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </MenuPopover>
+        </Menu>
         <Avatar name="Sarah Chen" size={28} color="platinum" />
       </div>
     </div>

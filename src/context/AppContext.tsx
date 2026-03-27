@@ -13,13 +13,15 @@ import { mockRecentRuns } from '../data/mockData';
 interface AppState {
   runs: ProspectingRun[];
   activeRunId: string | null;
-  currentStep: number; // 0=dashboard, 1=import, 2=configure, 3=recommendations, 4=outreach
+  currentStep: number; // -1=docs, 0=dashboard, 1=import, 2=configure, 3=recommendations, 4=outreach
+  activeDocSlug: string | null;
 }
 
 const initialState: AppState = {
   runs: mockRecentRuns,
   activeRunId: null,
   currentStep: 0,
+  activeDocSlug: null,
 };
 
 // ─── Actions ────────────────────────────────────────────────
@@ -34,7 +36,8 @@ type Action =
   | { type: 'UPDATE_RECOMMENDATION_STATUS'; payload: { runId: string; rank: number; status: AccountRecommendation['status'] } }
   | { type: 'UPDATE_RECOMMENDATION'; payload: { runId: string; rank: number; updates: Partial<Pick<AccountRecommendation, 'accountName' | 'reasoning'> & { bestContact: Partial<AccountRecommendation['bestContact']> }> } }
   | { type: 'SET_OUTREACH_DRAFTS'; payload: { runId: string; drafts: OutreachDraft[] } }
-  | { type: 'SET_RUN_STATUS'; payload: { runId: string; status: ProspectingRun['status'] } };
+  | { type: 'SET_RUN_STATUS'; payload: { runId: string; status: ProspectingRun['status'] } }
+  | { type: 'SHOW_DOC'; payload: string };
 
 function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -129,6 +132,8 @@ function appReducer(state: AppState, action: Action): AppState {
           r.id === action.payload.runId ? { ...r, status: action.payload.status } : r
         ),
       };
+    case 'SHOW_DOC':
+      return { ...state, currentStep: -1, activeDocSlug: action.payload };
     default:
       return state;
   }

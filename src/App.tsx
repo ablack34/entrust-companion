@@ -8,6 +8,7 @@ import ImportAccounts from './screens/ImportAccounts';
 import ConfigureRules from './screens/ConfigureRules';
 import Recommendations from './screens/Recommendations';
 import OutreachPack from './screens/OutreachPack';
+import DocumentationViewer from './screens/DocumentationViewer';
 
 const useStyles = makeStyles({
   root: {
@@ -22,6 +23,8 @@ const AppContent: React.FC = () => {
 
   const renderScreen = () => {
     switch (state.currentStep) {
+      case -1:
+        return <DocumentationViewer />;
       case 1:
         return <ImportAccounts />;
       case 2:
